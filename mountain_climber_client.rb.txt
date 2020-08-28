@@ -1,0 +1,36 @@
+#!/usr/bin/ruby
+
+require "socket"
+require "net/http"
+require "json" 
+
+def player 
+  url         =  URI "https://randomuser.me/api/?format=json"
+  raw_data    = Net::HTTP.get url
+  data_hash   = JSON.parse(raw_data)
+  first_name  = data_hash["results"][0]["name"]["first"]
+  last_name   = data_hash["results"][0]["name"]["last"]
+  return "#{first_name} #{last_name}"
+end
+
+player1 = player
+player2 = player
+
+puts "do you want to play mounntain climbers?"
+user_input = gets.chomp.downcase
+data =''
+counter = 0
+while user_input == 'yes' and counter < 5
+  session = TCPSocket.new("localhost", 4444)
+  session.puts ("#{player1} and #{player2} want to play")
+  while data = session.gets
+    puts  data
+    break if data.include? "won"
+  end
+  session.close
+  
+  puts "do you want to play again?"
+  user_input = gets.chomp.downcase
+  counter += 1
+end
+"you ran out of plays"
